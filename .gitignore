@@ -46,3 +46,6 @@ src/main/resources/production/
 
 # local environment config (may contain OAuth secrets) — see development.properties.example
 src/main/resources/development.properties
+
+# npm always writes a lockfile; this legacy project does not track one
+package-lock.json
