@@ -23,7 +23,10 @@ public class GoogleAuthController extends BaseController{
 	@Inject private UrlValidator urlValidator;
 	@Inject private LoginMethodManager loginManager;
 
-	@Get("/sign-up/google/")
+	// the OAuth callback arrives as /sign-up/google (no trailing slash, as
+	// registered in google.redirect_uri); the old route only matched the
+	// slashed variant, so the callback fell through to Jetty's 405
+	@Get({"/sign-up/google/", "/sign-up/google"})
 	public void signUpViaGoogle(String state, String code) {
 		Token token = service.getAccessToken(null, new Verifier(code));
 		SocialAPI googleAPI = new GoogleAPI(token, service);
