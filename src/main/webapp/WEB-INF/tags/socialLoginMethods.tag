@@ -14,5 +14,4 @@
 		<p>${t[buttonContentLabel]}</p>
 		<span class="google-button">${t[buttonContentText]}</span>
 	</a>
-	<p class="or">&#8212; ${t['auth.or']} &#8212;</p>
 </c:if>
