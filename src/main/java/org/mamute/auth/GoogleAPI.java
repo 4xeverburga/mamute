@@ -40,7 +40,9 @@ public class GoogleAPI implements SocialAPI{
 
 	private Response makeRequest(Token accessToken) {
 		OAuthRequest request = new OAuthRequest(Verb.GET, "https://www.googleapis.com/oauth2/v3/userinfo");
-		service.signRequest(accessToken, request);
+		// Bearer header instead of Scribe's OAuth2 signing, which appends the
+		// token as a query parameter Google no longer honours
+		request.addHeader("Authorization", "Bearer " + accessToken.getToken());
 		return request.send();
 	}
 
