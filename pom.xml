@@ -990,14 +990,37 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+		<!-- HTTPS repository declarations.
+		     The build used to fail outright on Maven 3.8.1+, which blocks external
+		     http:// repositories ("maven-default-http-blocker"). Three were involved:
+		       * sonatype-oss-public (http://oss.sonatype.org/content/groups/public/)
+		         is now only a redirector to Maven Central, so it is dropped here;
+		         Central is already available as the "central" repository.
+		       * maven-restlet and apache.snapshots are inherited from dependency POMs
+		         over plain http. Declaring them here with the same ids and https URLs
+		         overrides those, and the Restlet mirror is the only place that
+		         actually hosts org.restlet.jee:org.restlet:2.1.1 (a solr-core 4.10.0
+		         transitive dependency, not present on Maven Central). -->
 		<repository>
-			<id>sonatype-oss-public</id>
-			<url>http://oss.sonatype.org/content/groups/public/</url>
+			<id>maven-restlet</id>
+			<name>Restlet repository (HTTPS)</name>
+			<url>https://maven.restlet.talend.com</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
 			<snapshots>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>apache.snapshots</id>
+			<name>Apache snapshot repository (HTTPS, disabled as before)</name>
+			<url>https://repository.apache.org/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 		<repository>
