@@ -1,0 +1,26 @@
+# Template for local environment overrides.
+# Copy to development.properties (gitignored) and fill in real values:
+#   cp development.properties.example development.properties
+#
+# VRaptor loads /environment.properties + /<env>.properties (this file, for the
+# "development" env) and falls back to /mamute.properties. Env-file values win.
+
+# local port override — mamute.properties ships host=http://localhost:8080,
+# which VRaptor uses to build ABSOLUTE redirect/callback URLs (signup/login
+# redirects, OAuth callback). Point it at the port you actually run on.
+host = http://localhost:8088
+
+# run Quartz jobs eagerly in dev
+force.quartz.jobs = true
+
+# Google OAuth web client (console.cloud.google.com -> APIs & Credentials).
+# Keys MUST match OAuthServiceCreator's constants. Register redirect URI:
+#   <host>/sign-up/google
+google.client_id = your_google_client_id.apps.googleusercontent.com
+google.client_secret = GOCSPX-your_google_client_secret
+
+# Facebook OAuth app (developers.facebook.com -> your app -> Facebook Login).
+# Keys MUST match OAuthServiceCreator's constants. Register redirect URI:
+#   <host>/sign-up/facebook/
+# facebook.app_id = your_facebook_app_id
+# facebook.app_secret = your_facebook_app_secret

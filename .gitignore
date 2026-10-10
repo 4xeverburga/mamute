@@ -43,3 +43,6 @@ src/main/webapp/assets/imgs
 src/main/webapp/WEB-INF/jsp/theme/custom/**/*
 src/main/resources/production.properties
 src/main/resources/production/
+
+# local environment config (may contain OAuth secrets) — see development.properties.example
+src/main/resources/development.properties

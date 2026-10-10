@@ -25,18 +25,22 @@ public class GoogleAPI implements SocialAPI{
 	
 	public Optional<SignupInfo> getSignupInfo() {
 		JsonObject jsonObject = new JsonParser().parse(makeRequest(getAccessToken()).getBody()).getAsJsonObject();
-	    String email = jsonObject.get("emails").getAsJsonArray().get(0).getAsJsonObject().get("value").getAsString();
-	    String name = jsonObject.get("displayName").getAsString();
-	    String photoUrl = jsonObject.get("image").getAsJsonObject().get("url").getAsString();
-	    
-	    SignupInfo signupInfo = new SignupInfo(MethodType.GOOGLE, email, fromTrustedText(name), "", photoUrl);
-	    return Optional.of(signupInfo);
+		// oauth2/v3/userinfo (the Google+ API this used to read was shut down in 2019)
+		String email = getOrNull(jsonObject, "email");
+		String name = getOrNull(jsonObject, "name");
+		String photoUrl = getOrNull(jsonObject, "picture");
+
+		SignupInfo signupInfo = new SignupInfo(MethodType.GOOGLE, email, fromTrustedText(name), "", photoUrl);
+		return Optional.of(signupInfo);
 	}
-	
+
+	private static String getOrNull(JsonObject json, String member) {
+		return json.has(member) && !json.get(member).isJsonNull() ? json.get(member).getAsString() : "";
+	}
+
 	private Response makeRequest(Token accessToken) {
-		OAuthRequest request = new OAuthRequest(Verb.GET, "https://www.googleapis.com/plus/v1/people/me");
+		OAuthRequest request = new OAuthRequest(Verb.GET, "https://www.googleapis.com/oauth2/v3/userinfo");
 		service.signRequest(accessToken, request);
-		request.addHeader("GData-Version", "3.0");
 		return request.send();
 	}
 
