@@ -9,7 +9,7 @@ set -euo pipefail
 : "${MAMUTE_ADMIN_USER:?}" "${MAMUTE_ADMIN_PASSWORD:?}"
 
 # NOTE: a single quote in MAMUTE_ADMIN_PASSWORD would break this SQL — keep
-# the bench password alphanumeric (bench convention).
+# the password alphanumeric.
 mysql -h db -uroot mamute_development <<SQL
 SET @admin = '${MAMUTE_ADMIN_USER}';
 SET @pass  = '${MAMUTE_ADMIN_PASSWORD}';

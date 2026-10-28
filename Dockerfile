@@ -1,8 +1,8 @@
-# Mamute bench sample image — JDK 8 + Maven, run via embedded Jetty 8
+# Mamute image — JDK 8 + Maven, run via embedded Jetty 8
 # (br.com.caelum.vraptor.server.Main), DB = MySQL 5.7 (compose `db` service).
 #
-# Build context is this repo's root (see compose.yaml).  The file is committed
-# here, not in the harness, so a bare checkout builds the app by itself.
+# Build context is this repo's root (see compose.yaml), so a bare checkout
+# builds the app by itself.
 #
 # NOTE: NO `apt-get install` here — the base (Debian bullseye) is EOL and its
 # security pool 404s. Node for the grunt build comes from the official

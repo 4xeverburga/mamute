@@ -1,5 +1,5 @@
 #!/bin/bash
-# Mamute sample app entrypoint: point hibernate at the compose db, write
+# Mamute app entrypoint: point hibernate at the compose db, write
 # development.properties from the example, start the app on embedded Jetty.
 # (The admin-credential bootstrap is a separate one-shot compose service —
 # it needs the mysql client, which lives in the mysql:5.7 image.)
@@ -28,7 +28,7 @@ sed -i "s#^host = .*#host = ${HOST_URL}#" \
   src/main/resources/development.properties
 # VRaptor loads properties from the classpath, where WEB-INF/classes (populated
 # at image build, before development.properties existed — it is gitignored in
-# the sample) shadows the source tree.  Without this copy VRaptor falls back to
+# this repo) shadows the source tree.  Without this copy VRaptor falls back to
 # mamute.properties' host=http://localhost:8080 and every absolute redirect
 # (signup/login success) points at a port the host browser cannot reach.
 cp src/main/resources/development.properties \
