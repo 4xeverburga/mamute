@@ -41,7 +41,7 @@ COPY package.json Gruntfile.js ./
 RUN npm install --no-audit --no-fund --loglevel=error \
  && ./node_modules/grunt-cli/bin/grunt build
 
-# entrypoint.sh is bind-mounted read-only at runtime by compose.yml — it is
+# entrypoint.sh is bind-mounted read-only at runtime by compose.yaml — it is
 # bench infra and must not be baked into (or drift inside) the image.
 
 # Must run on JDK 8 (Java 7 source/target; machine JDKs differ).

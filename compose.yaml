@@ -4,23 +4,36 @@
 # bench repo no longer knows how to start anything. `make pin` in the bench
 # repo points SAMPLE.commit_sha at a commit that contains this file.
 #
-# Two host ports are exported by the harness for every run, so concurrent
+# One host port is exported by the harness for every run, so concurrent
 # runs never collide:
 #   BENCH_HTTP_PORT   host port for the app   (default 8090)
-#   BENCH_DB_PORT     host port for mysql     (default 5434)
+#
+# The database publishes nothing: the harness reaches it with
+# `docker compose exec db ...`, so `data` really is the only way in.
 #
 # Credentials come from `.env`, which is tracked on purpose: its values are
 # synthetic and deterministic, so a bare checkout boots unchanged
 # (template: .env.example).
+#
+# Shape (bench repo: templates/compose.template.yaml):
+#   api    front <-> back
+#   data   back <-> db
+# At the pin `front` is on BOTH: the app is still server-rendered and reads
+# the database directly. Dropping `data` from `front` is the task, so do not
+# tidy it away here.
 name: mamute
+
+networks:
+  api: {}
+  data: {}
 
 services:
   db:
     image: mysql:5.7
+    networks:
+      - data
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"
-    ports:
-      - "${BENCH_DB_PORT:-5434}:3306"
     volumes:
       - db-data:/var/lib/mysql
     healthcheck:
@@ -29,10 +42,13 @@ services:
       timeout: 5s
       retries: 30
 
-  app:
+  front:
     build:
       context: .
       dockerfile: Dockerfile
+    networks:
+      - api
+      - data        # the task: remove this once the data side is extracted
     depends_on:
       db:
         condition: service_healthy
@@ -56,8 +72,10 @@ services:
   # credentials. Exits 0; `compose up --wait` treats a successful exit as done.
   bootstrap:
     image: mysql:5.7
+    networks:
+      - data
     depends_on:
-      app:
+      front:
         condition: service_healthy
     volumes:
       - ./bootstrap.sh:/bootstrap.sh:ro
