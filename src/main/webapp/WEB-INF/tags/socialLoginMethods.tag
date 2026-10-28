@@ -5,7 +5,7 @@
 
 <c:set var="buttonContentText" value="${buttonContent}.button.content"/>
 
-<%-- Facebook sign-up/login removed: the upstream app credentials no longer work
+<%-- Facebook sign-up/login removed: the app credentials no longer work
      and the legacy OAuth flow is unmaintained. Google sign-in remains. --%>
 
 <c:if test="${env.supports('feature.google.login')}">

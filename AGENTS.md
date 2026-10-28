@@ -1,10 +1,8 @@
 # AGENTS — Running Mamute locally
 
-Mamute is a Stack Overflow-style Q&A web application (upstream: https://github.com/caelum/mamute,
-Apache 2.0 — see `UPSTREAM.md`). Stack: VRaptor 4 + Weld CDI + Hibernate + JSP, Java 7
-source/target, embedded Jetty 8 via `br.com.caelum.vraptor.server.Main`.
-
-This repo is a **HEAD-only mirror** of upstream (no upstream history). Local branch: `main`.
+Mamute is a Stack Overflow-style Q&A web application. Stack: VRaptor 4 + Weld CDI +
+Hibernate + JSP, Java 7 source/target, embedded Jetty 8 via
+`br.com.caelum.vraptor.server.Main`.
 
 ---
 
@@ -25,7 +23,7 @@ This repo is a **HEAD-only mirror** of upstream (no upstream history). Local bra
 
 ```bash
 export JDK8=/usr/lib/jvm/jdk-8.0.202-oracle-x64
-cd /home/ever/Documents/Me/Work/2026/Kyndryl/Tinka/DemoModernizacion/mamute
+cd path/to/mamute
 
 # --- 1. MySQL (rootless podman; docker needs sudo on this machine) -----------
 podman start mamute-mysql 2>/dev/null || podman run -d --name mamute-mysql \
@@ -56,7 +54,7 @@ JAVA_HOME=$JDK8 nohup mvn -B exec:java \
 pkill -f 'exec:java'
 ```
 
-Port 8080 is occupied by the lotto-sale Tomcat in this workspace → use **8088**
+Port 8080 is often already taken on a dev box; the runbook uses **8088**
 (`-Dserver.port`, or env `PORT`).
 
 ---
@@ -80,13 +78,13 @@ Port 8080 is occupied by the lotto-sale Tomcat in this workspace → use **8088*
   `google.redirect_uri`, `facebook.app_id`, `facebook.app_secret`, `facebook.redirect_uri`.
   Callback = `env.get("host") + redirect_uri` — so the `host` property in
   `development.properties` must match the port you run on (it overrides mamute.properties'
-  `host=http://localhost:8080`, which otherwise bounces redirects to the lotto Tomcat).
+  `host=http://localhost:8080`, which otherwise bounces redirects to the wrong port).
 - **Google**: works. Register redirect URI `http://localhost:8088/sign-up/google` in GCP.
-  Patches vs upstream: profile fetched from `oauth2/v3/userinfo` (Google+ API is dead),
+  The profile is fetched from `oauth2/v3/userinfo` (Google+ API is dead),
   token exchanged manually against `oauth2.googleapis.com/token` (Scribe 1.3.5 can't parse
   Google's JSON token response), profile request signed with `Authorization: Bearer`.
   Callback route accepts both `/sign-up/google` and `/sign-up/google/`.
-- **Facebook**: sign-up/login button was REMOVED (upstream credentials dead, flow unmaintained).
+- **Facebook**: sign-up/login button was REMOVED (no working credentials, flow unmaintained).
   The controller/DAO code is still there; re-adding the button means restoring the
   `feature.facebook.login` block in `src/main/webapp/WEB-INF/tags/socialLoginMethods.tag`.
 - gcloud **cannot** create OAuth web clients (UI-only) — don't try.
@@ -118,7 +116,6 @@ Port 8080 is occupied by the lotto-sale Tomcat in this workspace → use **8088*
 | App | `http://localhost:8088/` |
 | Server log | `/tmp/mamute.log` (or the terminal running `exec:java`) |
 | MySQL | `podman exec mamute-mysql mysql -uroot mamute_development` |
-| Mock SP / lotto Tomcat | port 8080 (different app, see `../migration-orchestrator/AGENTS.md`) |
 
 ## 6. Troubleshooting
 
