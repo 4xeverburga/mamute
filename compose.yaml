@@ -1,0 +1,70 @@
+# Mamute — eval environment.
+#
+# This file lives IN the sample: it is part of the pinned commit, and the
+# bench repo no longer knows how to start anything. `make pin` in the bench
+# repo points SAMPLE.commit_sha at a commit that contains this file.
+#
+# Two host ports are exported by the harness for every run, so concurrent
+# runs never collide:
+#   BENCH_HTTP_PORT   host port for the app   (default 8090)
+#   BENCH_DB_PORT     host port for mysql     (default 5434)
+#
+# Credentials come from `.env`, which is tracked on purpose: its values are
+# synthetic and deterministic, so a bare checkout boots unchanged
+# (template: .env.example).
+name: mamute
+
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+    ports:
+      - "${BENCH_DB_PORT:-5434}:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${BENCH_HTTP_PORT:-8090}:8080"
+    volumes:
+      - ./entrypoint.sh:/workspace/entrypoint.sh:ro
+    environment:
+      # fail fast instead of booting with empty credentials
+      MAMUTE_ADMIN_USER: ${MAMUTE_ADMIN_USER:?set .env (cp from .env.example)}
+      MAMUTE_ADMIN_PASSWORD: ${MAMUTE_ADMIN_PASSWORD:?set .env (cp from .env.example)}
+      MAMUTE_PUBLIC_URL: ${MAMUTE_PUBLIC_URL:-http://localhost:${BENCH_HTTP_PORT:-8090}}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8080/"]
+      interval: 5s
+      timeout: 10s
+      retries: 60
+      start_period: 240s
+
+  # One-shot: rotates the first-boot seeded moderator to the .env admin
+  # credentials. Exits 0; `compose up --wait` treats a successful exit as done.
+  bootstrap:
+    image: mysql:5.7
+    depends_on:
+      app:
+        condition: service_healthy
+    volumes:
+      - ./bootstrap.sh:/bootstrap.sh:ro
+    entrypoint: ["bash", "/bootstrap.sh"]
+    environment:
+      MAMUTE_ADMIN_USER: ${MAMUTE_ADMIN_USER:?set .env (cp from .env.example)}
+      MAMUTE_ADMIN_PASSWORD: ${MAMUTE_ADMIN_PASSWORD:?set .env (cp from .env.example)}
+
+volumes:
+  db-data:
