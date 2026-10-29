@@ -13,11 +13,9 @@ views; the backend is Java behind VRaptor 4.
 
 ## Running it
 
-The repository is packaged as a container stack: `docker compose up --build`
-starts the application and its database (`compose.yaml`, `Dockerfile`,
-`entrypoint.sh`, `.env.example`). `AGENTS.md` is the local runbook,
-including how to run it outside the container with JDK 8 and how the web
-assets are built.
+`AGENTS.md` is the runbook: JDK 8, Maven, a MySQL 5.7 service and the grunt
+build of the web assets, plus the OAuth setup for local sign-in. The
+synthetic credentials a checkout boots with are in `.env`.
 
 ## Tests
 
