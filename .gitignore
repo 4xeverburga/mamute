@@ -50,6 +50,7 @@ src/main/resources/development.properties
 # npm always writes a lockfile; this legacy project does not track one
 package-lock.json
 
-# `.env` is deliberately NOT ignored: it carries only synthetic, deterministic
-# sample credentials, and a bare checkout has to be able to start the stack
-# (template and rationale: .env.example).
+# `.env` is not tracked: the run it configures supplies those values, and
+# who runs it owns them. `.env.example` is the template (and the list of
+# the keys it reads).
+.env
